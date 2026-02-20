@@ -1,5 +1,5 @@
 // SET BIRTHDAY DATE
-const birthday = new Date("February 21, 2026 00:00:00").getTime();
+const birthday = new Date("February 23, 2026 00:00:00").getTime();
 
 const countdownEl = document.getElementById("countdown");
 const messageEl = document.getElementById("message");

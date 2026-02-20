@@ -7,17 +7,17 @@ const memeEl = document.getElementById("dailyMeme");
 
 const memes = [
     "https://www.youtube.com/shorts/a70duJHmn2Q",
-    "https://www.youtube.com/shorts/a70duJHmn2Q",
+    "https://www.youtube.com/shorts/TTXgKkVsSzU",
     "https://www.youtube.com/shorts/zzlm9_6G0Kg",
     "https://www.youtube.com/shorts/2-ZxoQczqM0"
 ];
 
 // Messages corresponding to each meme (same order)
 const memeMessages = [
-    "Can't stop smiling — enjoy this short! 😄",
     "Thoda sa gyaan!- Never Chase, be you! 😄",
-    "Almost there — one more laugh coming up! 😜",
-    "Final day special — Happy Birthday to you!! 🎂🎉"
+    "We can't forget Nadia! 😄",
+    "Birthday Coming Soon! 😜",
+    "Final day special — Happy Birthday Yamini!! 🎂🎉"
 ];
 
 function buildEmbedUrl(url) {
@@ -28,6 +28,7 @@ function buildEmbedUrl(url) {
 
 const interval = setInterval(() => {
 
+    // Real time for countdown display
     const now = new Date().getTime();
     const distance = birthday - now;
 
@@ -44,9 +45,15 @@ const interval = setInterval(() => {
         messageEl.classList.remove("hidden");
     }
 
-    // 🎭 Show memes when 3 days left (including final day = 0)
-    if (days <= 3 && days >= 0) {
-        const idx = 3 - days;
+    // 🎭 Show memes when 3 days left (including final day = 0) — use calendar days
+    const nowCalendar = new Date();
+    nowCalendar.setHours(0, 0, 0, 0);
+    const birthdayCalendar = new Date("February 23, 2026");
+    birthdayCalendar.setHours(0, 0, 0, 0);
+    const daysRemaining = Math.floor((birthdayCalendar.getTime() - nowCalendar.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (daysRemaining <= 3 && daysRemaining >= 0) {
+        const idx = 3 - daysRemaining;
         const originalEntry = memes[idx];
         const messageText = memeMessages[idx] || "Enjoy this meme!";
         const videoSrc = buildEmbedUrl(originalEntry);

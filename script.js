@@ -20,10 +20,47 @@ const memeMessages = [
     "Final day special — Happy Birthday Yamini!! 🎂🎉"
 ];
 
+// Final-surprise date (day after birthday)
+const finalSurpriseDate = new Date("February 24, 2026");
+finalSurpriseDate.setHours(0,0,0,0);
+
 function buildEmbedUrl(url) {
     const match = url.match(/(?:embed\/|v=|be\/)([A-Za-z0-9_-]{11})/);
     const id = match ? match[1] : url;
     return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&rel=0&playsinline=1`;
+}
+
+// Show Bazinga bubble overlay for a given duration (ms)
+function showBazingaBubbles(duration = 15000) {
+    // prevent multiple overlays
+    if (document.getElementById('bazinga-overlay')) return;
+    const overlay = document.createElement('div');
+    overlay.id = 'bazinga-overlay';
+    overlay.className = 'bazinga-overlay';
+    document.body.appendChild(overlay);
+
+    const count = 24;
+    for (let i = 0; i < count; i++) {
+        const b = document.createElement('div');
+        b.className = 'bazinga-bubble';
+        b.textContent = 'bazinga';
+        const size = 40 + Math.random() * 60; // 40-100px
+        b.style.width = `${size}px`;
+        b.style.height = `${size}px`;
+        b.style.left = `${Math.random() * 100}%`;
+        b.style.top = `${Math.random() * 100}%`;
+        b.style.opacity = `${0.7 + Math.random() * 0.3}`;
+        b.style.transform = `translate(-50%,-50%) rotate(${Math.random()*40-20}deg)`;
+        b.style.animationDelay = `${Math.random()*0.8}s`;
+        b.style.animationDuration = `${6 + Math.random()*6}s`;
+        overlay.appendChild(b);
+    }
+
+    // remove after duration
+    setTimeout(() => {
+        overlay.classList.add('bazinga-fade');
+        setTimeout(() => { overlay.remove(); }, 800);
+    }, duration);
 }
 
 const interval = setInterval(() => {
@@ -65,6 +102,30 @@ const interval = setInterval(() => {
             <p class="meme-message">${messageText}</p>
             <p><a href="${watchUrl}" target="_blank" rel="noopener noreferrer">Click for gyaan/giggles 🤣</a></p>
         `;
+    }
+
+    // Special: on Feb 24, 2026 show one more final surprise link
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    if (today.getTime() === finalSurpriseDate.getTime()) {
+        const finalUrl = 'https://www.youtube.com/shorts/oxWnDH747jg';
+        const idMatch = finalUrl.match(/(?:embed\/|v=|be\/)([A-Za-z0-9_-]{11})/);
+        const watchUrl = idMatch ? `https://www.youtube.com/watch?v=${idMatch[1]}` : finalUrl;
+        memeEl.innerHTML = `
+            <h2>One more final surprise 🎁</h2>
+            <p class="meme-message">Click below for one last thing!</p>
+            <p><a id="finalSurpriseLink" href="${watchUrl}" target="_blank" rel="noopener noreferrer">Open the final surprise ✨</a></p>
+        `;
+
+        // attach click handler to show bubbles while opening link
+        const link = document.getElementById('finalSurpriseLink');
+        if (link) {
+            link.addEventListener('click', (ev) => {
+                // show bubbles on current page
+                showBazingaBubbles(15000);
+                // let the anchor open in new tab naturally
+            });
+        }
     }
 
     // If we've reached the birthday moment (distance < 0) still show the final-day meme

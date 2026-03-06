@@ -88,24 +88,6 @@ function showBazingaBubbles(duration = 15000) {
     }, duration);
 }
 
-// show a centered sunflower overlay for a short time
-function showSunflowerOverlay(duration = 8000) {
-    if (document.getElementById('sunflower-overlay')) return;
-    const overlay = document.createElement('div');
-    overlay.id = 'sunflower-overlay';
-    overlay.className = 'sunflower-overlay';
-    document.body.appendChild(overlay);
-
-    const img = document.createElement('img');
-    img.src = 'images/sunflower.svg';
-    img.className = 'sunflower-img';
-    overlay.appendChild(img);
-
-    setTimeout(() => {
-        overlay.classList.add('sunflower-fade');
-        setTimeout(() => { overlay.remove(); }, 800);
-    }, duration);
-}
 
 
 
@@ -147,8 +129,7 @@ function setupLinkDropdown() {
 // run once right away (script loaded at bottom)
 setupLinkDropdown();
 
-// schedule periodic overlays (both sunflower and bazinga) every 15 seconds
+// schedule periodic bubbles every 10 seconds
 setInterval(() => {
-    showSunflowerOverlay();
     showBazingaBubbles();
-}, 15000);
+}, 10000);

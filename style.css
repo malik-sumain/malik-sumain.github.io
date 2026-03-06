@@ -28,6 +28,10 @@ body {
     text-align: center;
     position: relative;
     color: #1b1b1b;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .hidden {
@@ -110,6 +114,39 @@ a:hover {
     background: linear-gradient(135deg, #ff5a8c 0%, #ff7b83 100%);
 }
 
+#birthday-links {
+    margin: 24px auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#birthday-links h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+    color: #2b2b2b;
+}
+
+#linksDropdown {
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+    max-width: 320px;
+    margin-bottom: 12px;
+}
+
+#linkResult a {
+    color: #fff;
+    background: linear-gradient(135deg, #ff6b9d 0%, #ff8c94 100%);
+    padding: 10px 20px;
+    border-radius: 24px;
+    font-size: 14px;
+}
+
 /* Side photos */
 
 .side-photo {
@@ -160,16 +197,41 @@ a:hover {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: linear-gradient(180deg, #fff0 0%, rgba(255,235,59,0.12) 40%, rgba(255,179,0,0.18) 100%);
-    color: #3b2a18;
-    font-weight: 800;
-    text-transform: lowercase;
-    letter-spacing: 0.6px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12), inset 0 -6px 12px rgba(255,255,255,0.06);
-    transform: translate(-50%,-50%);
+    background: linear-gradient(135deg, #ff4b4b 0%, #ff0000 100%);
+    color: #000;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25), inset 0 -6px 12px rgba(255,255,255,0.2);
+    transform: translate(-50%,-50%) rotate(0deg);
     animation-name: bazingaFloat;
     animation-timing-function: ease-out;
     animation-iteration-count: 1;
+}
+
+/* sunflower overlay */
+.sunflower-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+}
+.sunflower-img {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+    animation: sunflowerPop 1s ease forwards;
+}
+.sunflower-overlay.sunflower-fade .sunflower-img { opacity: 0; transition: opacity 0.6s; }
+
+@keyframes sunflowerPop {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes bazingaFloat {

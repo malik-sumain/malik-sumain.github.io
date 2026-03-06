@@ -1,8 +1,9 @@
-// SET BIRTHDAY DATE
+// SET BIRTHDAY DATE (not used in this version but kept for reference)
 const birthday = new Date("February 23, 2026 00:00:00").getTime();
 
-const countdownEl = document.getElementById("countdown");
-const messageEl = document.getElementById("message");
+// Elements we no longer actively manipulate
+// const countdownEl = document.getElementById("countdown");
+// const messageEl = document.getElementById("message");
 const memeEl = document.getElementById("dailyMeme");
 
 const memes = [
@@ -19,6 +20,30 @@ const memeMessages = [
     "Birthday Coming Soon! 😜",
     "Final day special — Happy Birthday Yamini!! 🎂🎉"
 ];
+
+// build an array of date->link entries for the dropdown
+const linkEntries = [];
+// compute human-readable dates based on the birthday constant
+(function buildLinkEntries() {
+    const birthdayDate = new Date("February 23, 2026");
+    birthdayDate.setHours(0,0,0,0);
+    // memes correspond to 3 days before, 2 days before, 1 day before, and birthday
+    for (let i = 0; i < memes.length; i++) {
+        const entryDate = new Date(birthdayDate);
+        entryDate.setDate(entryDate.getDate() - (3 - i));
+        linkEntries.push({
+            date: entryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            url: memes[i]
+        });
+    }
+    // final surprise entry the day after birthday
+    const finalDate = new Date(birthdayDate);
+    finalDate.setDate(finalDate.getDate() + 1);
+    linkEntries.push({
+        date: finalDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        url: 'https://www.youtube.com/shorts/oxWnDH747jg'
+    });
+})();
 
 // Final-surprise date (day after birthday)
 const finalSurpriseDate = new Date("February 24, 2026");
@@ -43,7 +68,7 @@ function showBazingaBubbles(duration = 15000) {
     for (let i = 0; i < count; i++) {
         const b = document.createElement('div');
         b.className = 'bazinga-bubble';
-        b.textContent = 'bazinga';
+        b.textContent = 'BAZINGA!'; // all caps, funky
         const size = 40 + Math.random() * 60; // 40-100px
         b.style.width = `${size}px`;
         b.style.height = `${size}px`;
@@ -63,84 +88,67 @@ function showBazingaBubbles(duration = 15000) {
     }, duration);
 }
 
-const interval = setInterval(() => {
+// show a centered sunflower overlay for a short time
+function showSunflowerOverlay(duration = 8000) {
+    if (document.getElementById('sunflower-overlay')) return;
+    const overlay = document.createElement('div');
+    overlay.id = 'sunflower-overlay';
+    overlay.className = 'sunflower-overlay';
+    document.body.appendChild(overlay);
 
-    // Real time for countdown display
-    const now = new Date().getTime();
-    const distance = birthday - now;
+    const img = document.createElement('img');
+    img.src = 'images/sunflower.svg';
+    img.className = 'sunflower-img';
+    overlay.appendChild(img);
 
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    setTimeout(() => {
+        overlay.classList.add('sunflower-fade');
+        setTimeout(() => { overlay.remove(); }, 800);
+    }, duration);
+}
 
-    countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m`;
 
-    // 🎉 When birthday arrives
-    if (distance < 0) {
-        clearInterval(interval);
-        countdownEl.style.display = "none";
-        messageEl.classList.remove("hidden");
-    }
 
-    // 🎭 Show memes when 3 days left (including final day = 0) — use calendar days
-    const nowCalendar = new Date();
-    nowCalendar.setHours(0, 0, 0, 0);
-    const birthdayCalendar = new Date("February 23, 2026");
-    birthdayCalendar.setHours(0, 0, 0, 0);
-    const daysRemaining = Math.floor((birthdayCalendar.getTime() - nowCalendar.getTime()) / (1000 * 60 * 60 * 24));
+// --------- birthday links dropdown logic ----------
+function setupLinkDropdown() {
+    const dropdown = document.getElementById('linksDropdown');
+    const result = document.getElementById('linkResult');
+    if (!dropdown || !result) return;
 
-    if (daysRemaining <= 3 && daysRemaining >= 0) {
-        const idx = 3 - daysRemaining;
-        const originalEntry = memes[idx];
-        const messageText = memeMessages[idx] || "Enjoy this meme!";
-        const videoSrc = buildEmbedUrl(originalEntry);
-        const idMatch = originalEntry.match(/(?:embed\/|v=|be\/)([A-Za-z0-9_-]{11})/);
-        const watchUrl = idMatch ? `https://www.youtube.com/watch?v=${idMatch[1]}` : originalEntry;
-        console.log("[meme] index:", idx, "videoSrc:", videoSrc, "watchUrl:", watchUrl, "message:", messageText);
-        memeEl.innerHTML = `
-            <h2>Daily Meme/Gyaan Surprise 😂</h2>
-            <p class="meme-message">${messageText}</p>
-            <p><a href="${watchUrl}" target="_blank" rel="noopener noreferrer">Click for gyaan/giggles 🤣</a></p>
-        `;
-    }
+    // default placeholder option
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = '-- select a date --';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    dropdown.appendChild(placeholder);
 
-    // Special: on Feb 24, 2026 show one more final surprise link
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    if (today.getTime() === finalSurpriseDate.getTime()) {
-        const finalUrl = 'https://www.youtube.com/shorts/oxWnDH747jg';
-        const idMatch = finalUrl.match(/(?:embed\/|v=|be\/)([A-Za-z0-9_-]{11})/);
-        const watchUrl = idMatch ? `https://www.youtube.com/watch?v=${idMatch[1]}` : finalUrl;
-        memeEl.innerHTML = `
-            <h2>One more final surprise 🎁</h2>
-            <p class="meme-message">Click below for one last thing!</p>
-            <p><a id="finalSurpriseLink" href="${watchUrl}" target="_blank" rel="noopener noreferrer">Open the final surprise ✨</a></p>
-        `;
+    linkEntries.forEach(entry => {
+        const opt = document.createElement('option');
+        opt.value = entry.url;
+        opt.textContent = entry.date;
+        dropdown.appendChild(opt);
+    });
 
-        // attach click handler to show bubbles while opening link
-        const link = document.getElementById('finalSurpriseLink');
-        if (link) {
-            link.addEventListener('click', (ev) => {
-                // show bubbles on current page
-                showBazingaBubbles(15000);
-                // let the anchor open in new tab naturally
-            });
+    dropdown.addEventListener('change', () => {
+        const url = dropdown.value;
+        const selectedText = dropdown.options[dropdown.selectedIndex].text;
+        if (url) {
+            // convert to watch url if needed
+            const idMatch = url.match(/(?:embed\/|v=|be\/)([A-Za-z0-9_-]{11})/);
+            const watchUrl = idMatch ? `https://www.youtube.com/watch?v=${idMatch[1]}` : url;
+            result.innerHTML = `<p><a href="${watchUrl}" target="_blank" rel="noopener noreferrer">Open link for ${selectedText}</a></p>`;
+        } else {
+            result.innerHTML = '';
         }
-    }
+    });
+}
 
-    // If we've reached the birthday moment (distance < 0) still show the final-day meme
-    else if (distance < 0) {
-        const idx = 3; // final-day meme index
-        const originalEntry = memes[idx];
-        const messageText = memeMessages[idx] || "Enjoy this meme!";
-        const idMatch = originalEntry.match(/(?:embed\/|v=|be\/)([A-Za-z0-9_-]{11})/);
-        const watchUrl = idMatch ? `https://www.youtube.com/watch?v=${idMatch[1]}` : originalEntry;
-        console.log("[meme final-day] watchUrl:", watchUrl, "message:", messageText);
-        memeEl.innerHTML = `
-            <h2>Daily Meme/Gyaan Surprise 😂</h2>
-            <p class="meme-message">${messageText}</p>
-            <p><a href="${watchUrl}" target="_blank" rel="noopener noreferrer">Click for gyaan/giggles 🤣</a></p>
-        `;
-    }
+// run once right away (script loaded at bottom)
+setupLinkDropdown();
 
-}, 1000);
+// schedule periodic overlays (both sunflower and bazinga) every 15 seconds
+setInterval(() => {
+    showSunflowerOverlay();
+    showBazingaBubbles();
+}, 15000);
